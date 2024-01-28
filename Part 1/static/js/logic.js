@@ -9,21 +9,25 @@ d3.json(url).then(function (data) {
 });
 
 function createFeatures(earthquakeData) {
-
   // Define a function that we want to run once for each feature in the features array.
   // Give each feature a popup that describes the place and time of the earthquake.
   function onEachFeature(feature, layer) {
-    layer.bindPopup(`<h3>${feature.properties.place}</h3><hr><p>${new Date(feature.properties.time)}</p>`);
-    console.log(feature.properties);
+    // Bind a popup to each feature displaying place and time information.
+    layer.bindPopup(`<h3>${feature.properties.place}</h3><p>${new Date(feature.properties.time)}</p></hr>`);
+
+    // Access the coordinates property within the 'geometry' object and log them.
+    console.log("Longitude:", feature.geometry.coordinates[0]);
+    console.log("Latitude:", feature.geometry.coordinates[1]);
+    console.log("Depth:", feature.geometry.coordinates[2]);
   }
 
-  // Create a GeoJSON layer that contains the features array on the earthquakeData object.
-  // Run the onEachFeature function once for each piece of data in the array.
+  // Create a GeoJSON layer that contains the features array in the earthquakeData object.
+  // Run the onEachFeature function once for each feature in the array.
   let earthquakes = L.geoJSON(earthquakeData, {
     onEachFeature: onEachFeature
   });
 
-  // Send our earthquakes layer to the createMap function/
+  // Send the earthquakes layer to the createMap function.
   createMap(earthquakes);
 }
 
@@ -38,6 +42,7 @@ function createMap(earthquakes) {
     attribution: 'Map data: &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors, <a href="http://viewfinderpanoramas.org">SRTM</a> | Map style: &copy; <a href="https://opentopomap.org">OpenTopoMap</a> (<a href="https://creativecommons.org/licenses/by-sa/3.0/">CC-BY-SA</a>)'
   });
   
+
 
   // Create a baseMaps object.
   let baseMaps = {

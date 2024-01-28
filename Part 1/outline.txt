@@ -1,0 +1,54 @@
+bubble size (magnitude)
+bubble color (depth)
+color legend
+
+psuedocode
+top level
+
+URL
+json request
+createFeatures
+CreateMap
+
+// GET request
+d3.json(url).then(function (data) {
+    //reference json documentation
+    //call createFeatures function and pass response data object
+    createFeatures(data.features);})
+
+function createFeatures
+   function onEachFeature
+        creates popup box inner HTML
+            feature.properties.place 
+            feature.properties.time
+    //create geojson layer
+    let earthquakes = L.geoJSON(earthquakeData, {onEachFeature: onEachFeature})
+    createMap
+
+function createMap 
+    create basemaps
+        //leaflet tile and image layers
+        //https://leafletjs.com/plugins.html#basemap-providers
+        street = L.tileLayer ('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png')
+        topo = L.tileLayer ('https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png')
+    
+    create baseMaps object
+        "Street Map": street,
+        "Topographic Map": topo
+        
+    create overlayMaps object
+        Earthquakes: earthquakes //function argument
+    
+    create myMap = L.map()"map", {} 
+        // initialize the map on the "map" div with a given center and zoom
+        //https://leafletjs.com/reference.html#map-example
+        center[lat,long],
+        zoom: level,
+        layers: [baseMap object,overLays object]
+
+    //create layer control
+    L.control.layers(base, ovelay, {parameters}.addTo(myMap))
+    
+
+
+
