@@ -1,29 +1,59 @@
-// Store our API endpoint as queryUrl.
 let url = "https://earthquake.usgs.gov/fdsnws/event/1/query?format=geojson&starttime=2021-01-01&endtime=2021-01-02&maxlongitude=-69.52148437&minlongitude=-123.83789062&maxlatitude=48.74894534&minlatitude=25.16517337";
 
-// Perform a GET request to the query URL/
+// Declare the myMap variable in the global scope so it can be accessed by multiple functions
+let myMap;
+
+// Perform a GET request to the query URL.
 d3.json(url).then(function (data) {
-  // Once we get a response, send the data.features object to the createFeatures function.
+  // Once we get a response, send the response.features object to the createFeatures function.
   createFeatures(data.features);
-  console.log(data.features);
 });
+
+function markerSize(quakeMagnitude) {
+  return Math.sqrt(quakeMagnitude) * 20;
+}
+
+function markerColor(quakeDepth) {
+  let color = "";
+  if (quakeDepth > 90) {
+    color = "red";
+  } else if (quakeDepth >= 70 && quakeDepth <= 90) {
+    color = "orange";
+  } else if (quakeDepth >= 50 && quakeDepth <= 69) {
+    color = "goldenrod";
+  } else if (quakeDepth >= 30 && quakeDepth <= 49) {
+    color = "yellow";
+  } else if (quakeDepth >= 10 && quakeDepth <= 29) {
+    color = 'ccff33';
+  } else if (quakeDepth >= -10 && quakeDepth <= 9) {
+    color = "greenyellow";
+  } else {
+    color = "black";
+  }
+  return color;
+}
 
 function createFeatures(earthquakeData) {
   // Define a function that we want to run once for each feature in the features array.
-  // Give each feature a popup that describes the place and time of the earthquake.
   function onEachFeature(feature, layer) {
-    // Bind a popup to each feature displaying place and time information.
-    layer.bindPopup(`<h3>${feature.properties.place}</h3><p>${new Date(feature.properties.time)}</p></hr>`);
+    let circleMarker = L.circleMarker([feature.geometry.coordinates[1], feature.geometry.coordinates[0]], {
+      fillOpacity: 0.25,
+      color: "clear",
+      fillColor: markerColor(feature.geometry.coordinates[2]),
+      radius: markerSize(feature.properties.mag)
+    });
 
-    // Access the coordinates property within the 'geometry' object and log them.
-    console.log("Longitude:", feature.geometry.coordinates[0]);
-    console.log("Latitude:", feature.geometry.coordinates[1]);
-    console.log("Depth:", feature.geometry.coordinates[2]);
+    circleMarker.bindPopup(`<h3>${feature.properties.place}</h3><hr><p>${new Date(feature.properties.time)}</p>`);
+
+    // Add the circle marker to the earthquakes layer
+    circleMarker.addTo(earthquakes);
   }
 
-  // Create a GeoJSON layer that contains the features array in the earthquakeData object.
-  // Run the onEachFeature function once for each feature in the array.
-  let earthquakes = L.geoJSON(earthquakeData, {
+  // Create a GeoJSON layer that contains the features array on the earthquakeData object.
+  // Run the onEachFeature function once for each piece of data in the array.
+  let earthquakes = L.layerGroup(); // Create a layer group for the circle markers
+
+  L.geoJSON(earthquakeData, {
     onEachFeature: onEachFeature
   });
 
@@ -32,7 +62,6 @@ function createFeatures(earthquakeData) {
 }
 
 function createMap(earthquakes) {
-
   // Create the base layers.
   let street = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
     attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
@@ -42,8 +71,6 @@ function createMap(earthquakes) {
     attribution: 'Map data: &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors, <a href="http://viewfinderpanoramas.org">SRTM</a> | Map style: &copy; <a href="https://opentopomap.org">OpenTopoMap</a> (<a href="https://creativecommons.org/licenses/by-sa/3.0/">CC-BY-SA</a>)'
   });
   
-
-
   // Create a baseMaps object.
   let baseMaps = {
     "Street Map": street,
@@ -56,7 +83,7 @@ function createMap(earthquakes) {
   };
 
   // Create our map, giving it the streetmap and earthquakes layers to display on load.
-  let myMap = L.map("map", {
+  myMap = L.map("map", {
     center: [
       37.09, -95.71
     ],
@@ -70,5 +97,4 @@ function createMap(earthquakes) {
   L.control.layers(baseMaps, overlayMaps, {
     collapsed: false
   }).addTo(myMap);
-
 }

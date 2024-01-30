@@ -22,10 +22,11 @@ function createFeatures
             feature.properties.place 
             feature.properties.time
     //create geojson layer
+    //https://leafletjs.com/reference.html#geojson
     let earthquakes = L.geoJSON(earthquakeData, {onEachFeature: onEachFeature})
     createMap
 
-function createMap 
+function createMap (L.geoJson Object)
     create basemaps
         //leaflet tile and image layers
         //https://leafletjs.com/plugins.html#basemap-providers
@@ -37,7 +38,7 @@ function createMap
         "Topographic Map": topo
         
     create overlayMaps object
-        Earthquakes: earthquakes //function argument
+        Earthquakes: earthquakes //function gejson argument
     
     create myMap = L.map()"map", {} 
         // initialize the map on the "map" div with a given center and zoom
