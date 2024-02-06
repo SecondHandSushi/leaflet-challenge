@@ -3,20 +3,23 @@ let myMap;
 let timeStamp;
 let quakeDepth;
 
-url = "https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/all_day.geojson";
+//
+url = "https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/all_week.geojson";
 
 // Perform a GET request to the query URL.
-d3.json(url).then(function (data) {
-  // Once we get a response, send the response.features object to the createFeatures function.
-  createFeatures(data.features);
-  timeStamp = data.metadata.generated;
+d3.json(url).then(function (data) 
+{
+  createFeatures(data.features); // Once we get a response, send the response.features object to the createFeatures function.
+  timeStamp = data.metadata.generated; //was planning to put in a banner at the bottom of the screen to show the update time
   console.log(`Last updated: ${new Date(timeStamp)}`);
 });
 
-function markerSize(quakeMagnitude) {
+function markerSize(quakeMagnitude) 
+{
   return Math.sqrt(quakeMagnitude) * 20;
 }
 
+//this function sets the marker coloor equal to the depth of the earthquake
 function markerColor(quakeDepth) {
   let color = "";
   if (quakeDepth > 90.00) {
@@ -58,9 +61,8 @@ function createFeatures(earthquakeData) {
       fillColor: markerColor(depth), // Pass the depth value to markerColor
       radius: markerSize(magnitude)
     });
-  
+    
     circleMarker.bindPopup(`<h3>${feature.properties.place}</h3><hr><p>${new Date(feature.properties.time)}</p>`);
-  
     // Add the circle marker to the earthquakes layer
     circleMarker.addTo(earthquakes);
   }
@@ -83,9 +85,6 @@ function createMap(earthquakes) {
     attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
   });
 
-  // Create a baseMaps object.
-  let baseMaps =  street
-
   // Create an overlay object to hold our overlay.
   let overlayMaps = {
     Earthquakes: earthquakes
@@ -102,7 +101,7 @@ function createMap(earthquakes) {
     <i style="background: yellowgreen"></i><span>10-29</span><br>
     <i style="background: gold"></i><span>30-49</span><br>
     <i style="background: orange"></i><span>50-69</span><br>
-    <i style="background: darkorange"></i><span>70-0</span><br>
+    <i style="background: darkorange"></i><span>70-90</span><br>
     <i style="background: red"></i><span>90+</span><br>
     `;
     return div;
@@ -118,8 +117,6 @@ function createMap(earthquakes) {
   // Add the legend to the map
   legend.addTo(myMap);
 
-  // Create a layer control.
-  // Pass it our baseMaps and overlayMaps.
   // Add the layer control to the map.
   L.control.layers(overlayMaps, {
     collapsed: false
